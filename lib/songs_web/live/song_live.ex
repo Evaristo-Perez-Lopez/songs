@@ -13,12 +13,9 @@ defmodule SongsWeb.SongLive do
 
   def render(assigns) do
     ~H"""
-    <h1>Songs</h1>
      <.flash_group flash={@flash} />
-    <pre>
-    <%= inspect(@songs, pretty: true) %>
-    </pre>
-    <.form for={@form} phx-submit="save">
+    <h1 class="font-bold text-xl text-center text-sky-700 p-3">Songs</h1>
+    <.form class="p-3 border-2 rounded mb-3" for={@form} phx-submit="save">
       <.input field={@form[:title]} placeholder="Enter a title" autocomplete="off" />
       <.input
         field={@form[:times]}
@@ -26,12 +23,14 @@ defmodule SongsWeb.SongLive do
         placeholder="Enter times you heard it"
         autocomplete="off"
       />
-      <.button type="submit" phx-disable-with="Saving...">Save</.button>
+      <.button class="mt-3" type="submit" phx-disable-with="Saving...">Save</.button>
     </.form>
-
-    <pre>
-    <%= inspect(@form, pretty: true) %>
-    </pre>
+    <%= if @songs == [] do %>
+      <p class="text-center text-gray-500">No songs yet</p>
+    <% end %>
+      <%= for song <- @songs do %>
+        <.songcard title={song.title} times={song.times} />
+      <% end %>
     """
   end
 
@@ -47,5 +46,13 @@ defmodule SongsWeb.SongLive do
         socket = put_flash(socket, :error, "Something went wrong")
         {:noreply, assign(socket, :form, to_form(changeset))}
     end
+  end
+  def songcard(assigns) do
+    ~H"""
+    <div class="max-w-lg mx-auto py-2 box-border px-2 bg-gray-50 mb-2">
+      <h2 class="font-bold text-lg text-sky-600 py-3 border-b-2"><%= @title %></h2>
+      <p class="text-base text-gray-500 ">Heard <%= @times %> times</p>
+    </div>
+    """
   end
 end
